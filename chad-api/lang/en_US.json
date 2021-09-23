@@ -1,0 +1,8 @@
+{
+    "rate-limited": "It looks like I might be rate-limited right now. Please try again in a moment.",
+    "no-article": "I couldn't find a good article for you about",
+    "try-different-keywords": "Maybe try different keywords?",
+    "no-message": "The \"message\" header was not sent or was empty.",
+    "invalid-message": "The message sent contains invalid characters such as Unicode characters. Please resend the message with only plaintext/ASCII characters.",
+    "no-weather": "Unable to find weather data for"
+}
