@@ -4,6 +4,7 @@ use chad_api::nlp::question_answering::answer_question;
 use chad_api::nlp::topic::{determine_topic, Topic};
 use chad_api::text::{get_text, get_text_lonely};
 use chad_api::weather::request::request_weather;
+use chad_api::wiki_qa::question_answering::answer_wiki_question;
 use chad_api::{plain, PORT};
 
 #[get("/")]
@@ -29,6 +30,7 @@ async fn index(req: HttpRequest) -> impl Responder {
                         return get_text_lonely("rate-limited");
                     }
                 }
+
                 Some(Topic::Weather) => {
                     if let Some(city) =
                         answer_question(output, "What city is the message asking for weather for?")
@@ -43,7 +45,22 @@ async fn index(req: HttpRequest) -> impl Responder {
                         return get_text_lonely("rate-limited");
                     }
                 }
-                Some(topic) => return plain!(topic),
+
+                Some(Topic::Conversation) => {
+                    let without_mention = output.split_ascii_whitespace().collect::<Vec<&str>>()
+                        [1..]
+                        .to_vec()
+                        .join(" ");
+
+                    println!("Wiki Question Asked: \"{}\"", without_mention.clone());
+
+                    if let Some(response) = answer_wiki_question(&without_mention).await {
+                        return plain!(response);
+                    } else {
+                        return get_text_lonely("cant-understand-question");
+                    }
+                }
+
                 None => return get_text_lonely("rate-limited"),
             }
         } else {

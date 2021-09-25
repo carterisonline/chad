@@ -3,6 +3,7 @@ pub mod news;
 pub mod nlp;
 pub mod text;
 pub mod weather;
+pub mod wiki_qa;
 
 use std::fmt::Display;
 
