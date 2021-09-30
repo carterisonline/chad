@@ -1,3 +1,4 @@
+use log::info;
 use rust_bert::pipelines::question_answering::QaInput;
 
 use super::{QA_MODEL, WIKI_CLIENT};
@@ -5,10 +6,9 @@ use super::{QA_MODEL, WIKI_CLIENT};
 pub async fn answer_wiki_question(question: &str) -> Option<String> {
     if let Ok(articles) = (*WIKI_CLIENT).search(question) {
         if let Some(first_article) = articles.get(0) {
-            if let Ok(summary) = (*WIKI_CLIENT)
-                .page_from_title(first_article.clone())
-                .get_summary()
-            {
+            let page = (*WIKI_CLIENT).page_from_title(first_article.clone());
+            info!("Found page: {}", page.get_title().unwrap());
+            if let Ok(summary) = page.get_summary() {
                 let neural_question = QaInput {
                     question: question.to_string(),
                     context: summary,

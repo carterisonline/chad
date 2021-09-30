@@ -1,3 +1,4 @@
+use anyhow::{Context, Error, Result};
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 
@@ -45,11 +46,12 @@ pub async fn request_article(keyword: &str) -> Option<NewsResponse> {
         info!("Was able to find an article about {}", keyword);
         let news = out.news;
 
-        if let Some(latest) = news.get(0) {
-            return Some(latest.clone());
-        } else {
-            error!("Response error! Got {:?}", response);
-            return None;
+        match news.get(0) {
+            Some(id) => return Some(id.clone()),
+            None => {
+                error!("Response error! Got {:?}", response);
+                return None;
+            }
         }
     } else {
         error!("Response error! Got {:?}", response);

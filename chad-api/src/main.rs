@@ -6,13 +6,14 @@ use chad_api::text::{get_text, get_text_lonely};
 use chad_api::weather::request::request_weather;
 use chad_api::wiki_qa::question_answering::answer_wiki_question;
 use chad_api::{plain, PORT};
+use log::info;
 
 #[get("/")]
 async fn index(req: HttpRequest) -> impl Responder {
     if let Some(message) = req.headers().get("message") {
         if let Ok(output) = message.to_str() {
             match determine_topic(output).await {
-                Some(Topic::News) => {
+                Ok(Topic::News) => {
                     if let Some(article) =
                         answer_question(output, "What news topic does the message ask for?").await
                     {
@@ -31,7 +32,7 @@ async fn index(req: HttpRequest) -> impl Responder {
                     }
                 }
 
-                Some(Topic::Weather) => {
+                Ok(Topic::Weather) => {
                     if let Some(city) =
                         answer_question(output, "What city is the message asking for weather for?")
                             .await
@@ -46,13 +47,13 @@ async fn index(req: HttpRequest) -> impl Responder {
                     }
                 }
 
-                Some(Topic::Conversation) => {
+                Ok(Topic::Conversation) => {
                     let without_mention = output.split_ascii_whitespace().collect::<Vec<&str>>()
                         [1..]
                         .to_vec()
                         .join(" ");
 
-                    println!("Wiki Question Asked: \"{}\"", without_mention.clone());
+                    info!("Wiki Question Asked: \"{}\"", without_mention.clone());
 
                     if let Some(response) = answer_wiki_question(&without_mention).await {
                         return plain!(response);
@@ -61,7 +62,7 @@ async fn index(req: HttpRequest) -> impl Responder {
                     }
                 }
 
-                None => return get_text_lonely("rate-limited"),
+                Err(_) => return get_text_lonely("rate-limited"),
             }
         } else {
             return get_text_lonely("invalid-message");

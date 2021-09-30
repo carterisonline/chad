@@ -1,6 +1,6 @@
 [package]
 authors = ["Carter Reeb <me@carteris.online>"]
-edition = "2018"
+edition = "2021"
 name = "chad-bot"
 version = "0.1.0"
 

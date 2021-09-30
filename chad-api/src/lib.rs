@@ -1,6 +1,8 @@
+pub mod classification;
 pub mod db;
 pub mod news;
 pub mod nlp;
+pub mod status;
 pub mod text;
 pub mod weather;
 pub mod wiki_qa;
